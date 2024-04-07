@@ -18,12 +18,24 @@ public class SavingsManagerService {
         LocalDate nextSystemDate = systemDate.plusMonths(1);
 
         savingAccounts.forEach(savingAccount -> {
+            if (savingAccount.getInterestFrequency() == CapitalizationFrequency.QUARTERLY) {
+                    addQuarterlyInterest(savingAccount, nextSystemDate);
+            }
             if (savingAccount.getInterestFrequency() == CapitalizationFrequency.MONTHLY) {
                 addMonthlyInterest(savingAccount, nextSystemDate);
             }
         });
 
         systemDate = nextSystemDate;
+    }
+
+    private void addQuarterlyInterest(SavingsAccountModel savingAccount, LocalDate currentInterestMonth) {
+        LocalDate nextInterestDateForAccount = savingAccount.getLastInterestAppliedDate().plusMonths(3);
+
+        if (isSameMonthAndYear(currentInterestMonth, nextInterestDateForAccount)) {
+            addInterest(savingAccount);
+            savingAccount.setLastInterestAppliedDate(currentInterestMonth);
+        }
     }
 
     private void addMonthlyInterest(SavingsAccountModel savingAccount, LocalDate currentInterestMonth) {
